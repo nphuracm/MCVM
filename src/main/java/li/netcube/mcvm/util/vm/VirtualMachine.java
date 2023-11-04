@@ -201,7 +201,7 @@ public class VirtualMachine {
                         }
                     }
                 }
-            }
+            } catch (Exception ignored) {}
 
             try {
                 String[] aCommandLine = new String[commandLine.size()];
