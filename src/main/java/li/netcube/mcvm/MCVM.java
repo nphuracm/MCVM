@@ -103,18 +103,22 @@ public class MCVM
         registerCommandParser(new RedstoneCommandParser());
 
         File iniFile = new File("mcvm.ini");
-
+        File custParamFile = new File("mcvm-extra-qemu-params.txt");
         try {
             if (!iniFile.exists())
             {
                 iniFile.createNewFile();
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(iniFile));
                 bufferedWriter.write("[VirtualMachine]\r\n");
-                bufferedWriter.write("customArguments=\"\"\n\n");
+                bufferedWriter.write("useVgaAdapter=\"std\"\n\n");
+                bufferedWriter.write("useVcpuCount=\"\"\n\n");
+                bufferedWriter.write("useVirtEngine=\"tcg\"\n\n");
                 bufferedWriter.flush();
                 bufferedWriter.close();
             }
-            modConfig = new IniFile("mcvm.ini");
+            if(!custParamFile.exists()) {
+                custParamFile.createNewFile();
+            }
         } catch (Exception ignored) {}
 
     }

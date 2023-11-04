@@ -22,7 +22,6 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.SystemUtils;
 import org.lwjgl.Sys;
 
-
 public class VirtualMachine {
     public File hdd0 = null;
     public File hdd1 = null;
@@ -122,10 +121,27 @@ public class VirtualMachine {
                 commandLine.add("qemu-system-x86_64");
             }
 
-            commandLine.add("-vga");
-            commandLine.add("std");
-            commandLine.add("-smp");
-            commandLine.add("4");
+            /*
+             * The three following parameters are to be passed when there is user input
+             * in the corresponding INI entry
+             * If one of the three param's corresponding INI key has blank value, the
+             * param will not be passed to the QEMU command line and let QEMU decide
+             */
+            if (!MCVM.modConfig.getString("VirtualMachine", "useVirtEngine", "").equals("")) {
+                commandLine.add("-accel");
+                commandLine.add(MCVM.modConfig.getString("VirtualMachine", "useVirtEngine", ""));
+            }
+
+            if (!MCVM.modConfig.getString("VirtualMachine", "useVgaAdapter", "").equals("")) {
+                commandLine.add("-vga");
+                commandLine.add(MCVM.modConfig.getString("VirtualMachine", "useVgaAdapter", ""));
+            }
+
+            if (!MCVM.modConfig.getString("VirtualMachine", "useVcpuCount", "").equals("")) {
+                commandLine.add("-smp");
+                commandLine.add(MCVM.modConfig.getString("VirtualMachine", "useVcpuCount", ""));
+            }
+
             commandLine.add("-usbdevice");
             commandLine.add("tablet");
             commandLine.add("-k");
@@ -137,11 +153,11 @@ public class VirtualMachine {
             commandLine.add("-serial");
             commandLine.add("tcp::" + COMPort + ",server,nowait");
             commandLine.add("-vnc");
-            commandLine.add(":" + (VNCPort - 5900) + ",password");
+            commandLine.add(":" + (VNCPort - 5900) + ",password=on"); //short form boolean is deprecated
 
-            if (!MCVM.modConfig.getString("VirtualMachine", "customArguments", "").equals("")) {
+            /*if (!MCVM.modConfig.getString("VirtualMachine", "customArguments", "").equals("")) {
                 commandLine.add(MCVM.modConfig.getString("VirtualMachine", "customArguments", ""));
-            }
+            }*/
 
             if (this.nic != null) {
                 commandLine.add("-netdev");
@@ -169,6 +185,23 @@ public class VirtualMachine {
             commandLine.add("-drive"); commandLine.add("if=floppy,index=1" + ((this.floppy1 != null) ? ",file=" + this.floppy1 : ""));
 
             commandLine.add("-m"); commandLine.add(this.memory);
+
+            /* The following block reads an mcvm-extra-qemu-params.txt file and
+             * adds each line as a parameter at the end of the command line.
+             * This file is created already along with mcvm.ini during a fresh start
+             */
+            File custParamFile = new File("mcvm-extra-qemu-params.txt");
+            try {
+                if(custParamFile.exists()) {
+                    BufferedReader paramBufferedReader = new BufferedReader(new FileReader(custParamFile));
+                    String read;
+                    while(paramBufferedReader.readLine() != null) {
+                        if(!read.isEmpty()) {
+                            commandLine.add(read);
+                        }
+                    }
+                }
+            }
 
             try {
                 String[] aCommandLine = new String[commandLine.size()];
