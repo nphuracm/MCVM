@@ -195,7 +195,7 @@ public class VirtualMachine {
                 if(custParamFile.exists()) {
                     BufferedReader paramBufferedReader = new BufferedReader(new FileReader(custParamFile));
                     String read;
-                    while(paramBufferedReader.readLine() != null) {
+                    while((read = paramBufferedReader.readLine()) != null) {
                         if(!read.isEmpty()) {
                             commandLine.add(read);
                         }
@@ -229,8 +229,8 @@ public class VirtualMachine {
                 this.monitor = new TCPClient("127.0.0.1", this.MONPort);
                 this.serial = new TCPClient("127.0.0.1", this.COMPort);
 
-                this.monitor.getOutputStream().write(("change vnc password" + "\n").getBytes("UTF-8"));
-                this.monitor.getOutputStream().write((this.password + "\n").getBytes("UTF-8"));
+                this.monitor.getOutputStream().write((("change vnc password" + "\n").getBytes("UTF-8")));
+                this.monitor.getOutputStream().write((this.password + "\n").getBytes("UTF-8")); 
                 //System.out.println(this.password);
                 this.monitor.getOutputStream().flush();
 

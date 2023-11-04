@@ -110,14 +110,19 @@ public class MCVM
                 iniFile.createNewFile();
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(iniFile));
                 bufferedWriter.write("[VirtualMachine]\r\n");
-                bufferedWriter.write("useVgaAdapter=\"std\"\n\n");
+                bufferedWriter.write("useVirtEngine=\"tcg\"\n");
+                bufferedWriter.write("useVgaAdapter=\"std\"\n");
                 bufferedWriter.write("useVcpuCount=\"\"\n\n");
-                bufferedWriter.write("useVirtEngine=\"tcg\"\n\n");
                 bufferedWriter.flush();
                 bufferedWriter.close();
             }
+            modConfig = new IniFile("mcvm.ini");
             if(!custParamFile.exists()) {
                 custParamFile.createNewFile();
+                BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(custParamFile));
+                bufferedWriter.write("\n");
+                bufferedWriter.flush();
+                bufferedWriter.close();
             }
         } catch (Exception ignored) {}
 
